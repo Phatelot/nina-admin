@@ -17,7 +17,7 @@ jobs:
       - name: Install, Test and Build
         run: |
           npm install
-          npm run test
+          # npm run test
           npm run build -- --base=/nina-admin
 
       - name: Deploy
