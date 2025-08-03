@@ -50,7 +50,7 @@ async function uploadImageToRepo(imageName: string, fileContent: string) {
 		owner,
 		repo,
 		branch,
-		path: `image/${imageName}`,
+		path: `public/images/${imageName}`,
 		message: `add ${imageName}`,
 		content: fileContent,
 	})
