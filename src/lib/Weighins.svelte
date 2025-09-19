@@ -19,8 +19,8 @@
 
   async function send(weighins: {data: Weighing[]; sha: string;}) {
     weighins.data.push({day, weightInLbs});
-    await uploadWeighingsToRepo(weighins.data, weighins.sha);
     await uploadWeighinImageToRepo(weighins.data.length, imageBase64);
+    await uploadWeighingsToRepo(weighins.data, weighins.sha);
 
     imageBase64 = '';
     day = 0;

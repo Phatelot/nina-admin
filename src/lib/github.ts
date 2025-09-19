@@ -7,13 +7,13 @@ const branch = 'main';
 
 let octokit: Octokit;
 let token: string = (() => {
-    const token = getGithubToken() || '';
-    if (token) {
-      octokit = new Octokit({
-        auth: token,
-      });
-    }
-    return token;
+	const token = getGithubToken() || '';
+	if (token) {
+		octokit = new Octokit({
+			auth: token,
+		});
+	}
+	return token;
 })();
 
 export function octokitReady(): boolean {
@@ -33,15 +33,15 @@ export function getGithubToken(): string | null {
 }
 
 export async function uploadWeighinImageToRepo(weighinNumber: number, fileContent: string) {
-	return uploadImageToRepo(`${padNumberLeft(weighinNumber)}.png`, fileContent);
+	return uploadImageToRepo(`${padNumberLeft(weighinNumber)}.png`, fileContent, true);
 }
 
 function padNumberLeft(n: number): string {
-    let result = `${n}`
-    return '0'.repeat(3 - result.length) + result;
-  }
+	let result = `${n}`
+	return '0'.repeat(3 - result.length) + result;
+}
 
-async function uploadImageToRepo(imageName: string, fileContent: string) {
+async function uploadImageToRepo(imageName: string, fileContent: string, skipCI: boolean) {
 	if (!octokitReady()) {
 		throw new Error('please fill in Github token')
 	}
@@ -51,7 +51,7 @@ async function uploadImageToRepo(imageName: string, fileContent: string) {
 		repo,
 		branch,
 		path: `public/images/${imageName}`,
-		message: `add ${imageName}`,
+		message: `add ${imageName}${skipCI ? ' [skip ci]' : ''}`,
 		content: fileContent,
 	})
 }
