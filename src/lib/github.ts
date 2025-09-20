@@ -67,7 +67,10 @@ export async function uploadWeighingsToRepo(data: Weighin[], sha: string) {
 		branch,
 		path: `src/lib/weighings.json`,
 		message: `update weighins`,
-		content: window.btoa(JSON.stringify(data, null, 2)),
+		content: window.btoa(JSON.stringify({
+			$schema: "./schema.json",
+			weighings: data,
+		}, null, 2)),
 		sha,
 	})
 }
@@ -84,7 +87,7 @@ export async function getWeighings(): Promise<{data: Weighin[], sha: string}> {
 		path: 'src/lib/weighings.json',
 	}).then(r => {
 		const {content, sha} = (r.data as any);
-		const parsedContent = JSON.parse(window.atob(content)) as Weighin[];
+		const parsedContent = JSON.parse(window.atob(content)).weighings as Weighin[];
 		return {
 			data: parsedContent,
 			sha,

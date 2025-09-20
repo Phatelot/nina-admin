@@ -5,6 +5,7 @@
   let imageBase64 = $state('');
   let day = $state(0);
   let weightInLbs = $state(0);
+  let newScale = $state(false)
 
   function handleFileChange(event: any) {
     const file = event.target.files?.[0];
@@ -18,7 +19,12 @@
   }
 
   async function send(weighins: {data: Weighing[]; sha: string;}) {
-    weighins.data.push({day, weightInLbs});
+    const lastWeighing = weighins.data[weighins.data.length - 1]
+    weighins.data.push({
+      day,
+      weightInLbs,
+      scale: lastWeighing.scale + (newScale ? 1 : 0),
+    });
     await uploadWeighinImageToRepo(weighins.data.length, imageBase64);
     await uploadWeighingsToRepo(weighins.data, weighins.sha);
 
@@ -55,6 +61,10 @@
     <label>
       Weight in lbs
       <input type="number" min="0" bind:value={weightInLbs} />
+    </label>
+    <label>
+      Use new scale
+      <input type="checkbox" bind:checked={newScale} />
     </label>
   </form>
 
