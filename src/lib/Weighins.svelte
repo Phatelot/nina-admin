@@ -3,9 +3,18 @@
   import type { Weighing } from './model';
 
   let imageBase64 = $state('');
-  let day = $state(0);
+  let day = $state(getDefaultDay());
   let weightInLbs = $state(0);
+  let newShirt = $state(false)
+  let newShorts = $state(false)
+  let newPlateau = $state(false)
   let newScale = $state(false)
+
+  function getDefaultDay(): number {
+    const zeroDay = new Date("2025-04-30T16:00:00Z")
+    const differenceInMilliseconds = (new Date()).getTime() - zeroDay.getTime()
+    return Math.floor(differenceInMilliseconds / (86_400 * 1000))
+  }
 
   function handleFileChange(event: any) {
     const file = event.target.files?.[0];
@@ -18,12 +27,19 @@
     reader.readAsDataURL(file);
   }
 
+  function oneIfTrue(b: boolean): number {
+    return b ? 1 : 0
+  }
+
   async function send(weighins: {data: Weighing[]; sha: string;}) {
     const lastWeighing = weighins.data[weighins.data.length - 1]
     weighins.data.push({
       day,
       weightInLbs,
-      scale: lastWeighing.scale + (newScale ? 1 : 0),
+      scale: lastWeighing.scale + oneIfTrue(newScale),
+      shirt: lastWeighing.shirt + oneIfTrue(newShirt),
+      shorts: lastWeighing.shorts + oneIfTrue(newShorts),
+      plateau: lastWeighing.plateau
     });
     await uploadWeighinImageToRepo(weighins.data.length, imageBase64);
     await uploadWeighingsToRepo(weighins.data, weighins.sha);
@@ -60,7 +76,19 @@
     </label>
     <label>
       Weight in lbs
-      <input type="number" min="0" bind:value={weightInLbs} />
+      <input type="number" min="0" bind:value={weightInLbs}/>
+    </label>
+    <label>
+      Use new shirt
+      <input type="checkbox" bind:checked={newShirt} />
+    </label>
+    <label>
+      Use new shorts
+      <input type="checkbox" bind:checked={newShorts} />
+    </label>
+    <label>
+      New plateau
+      <input type="checkbox" bind:checked={newPlateau} />
     </label>
     <label>
       Use new scale
