@@ -5,4 +5,5 @@ export type Weighing = {
 	shirt: number;
 	shorts: number;
 	plateau: number;
+	sandals: number;
 };

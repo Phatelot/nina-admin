@@ -8,6 +8,7 @@
   let newShirt = $state(false)
   let newShorts = $state(false)
   let newPlateau = $state(false)
+  let newSandals = $state(false)
   let newScale = $state(false)
 
   function getDefaultDay(): number {
@@ -39,6 +40,7 @@
       scale: lastWeighing.scale + oneIfTrue(newScale),
       shirt: lastWeighing.shirt + oneIfTrue(newShirt),
       shorts: lastWeighing.shorts + oneIfTrue(newShorts),
+      sandals: lastWeighing.sandals + oneIfTrue(newSandals),
       plateau: lastWeighing.plateau
     });
     await uploadWeighinImageToRepo(weighins.data.length, imageBase64);
@@ -85,6 +87,10 @@
     <label>
       Use new shorts
       <input type="checkbox" bind:checked={newShorts} />
+    </label>
+    <label>
+      Use new sandals
+      <input type="checkbox" bind:checked={newSandals} />
     </label>
     <label>
       New plateau
