@@ -17,15 +17,71 @@
     return Math.floor(differenceInMilliseconds / (86_400 * 1000))
   }
 
+  const REQUIRED_WIDTH = 1930;
+  const REQUIRED_HEIGHT = 2218;
+
   function handleFileChange(event: any) {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-      imageBase64 = (reader.result as string).split(',')[1];
-    };
+      const dataUrl = reader.result as string;
+
+      const img = new Image();
+      img.onload = () => {
+        // Dimension check
+        if (img.width !== REQUIRED_WIDTH || img.height !== REQUIRED_HEIGHT) {
+          alert(
+            `Invalid image size. Expected ${REQUIRED_WIDTH}×${REQUIRED_HEIGHT}, ` +
+            `got ${img.width}×${img.height}.`
+          );
+          reset();
+          return;
+        }
+
+        // Transparency check
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          alert('Canvas not supported.');
+          reset();
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0);
+
+        const corners = [
+          ctx.getImageData(0, 0, 1, 1).data, // top-left
+          ctx.getImageData(img.width - 1, 0, 1, 1).data, // top-right
+          ctx.getImageData(0, img.height - 1, 1, 1).data, // bottom-left
+          ctx.getImageData(img.width - 1, img.height - 1, 1, 1).data // bottom-right
+        ];
+
+        const allCornersTransparent = corners.every(
+          pixel => pixel[3] === 0 // alpha channel
+        );
+
+        if (!allCornersTransparent) {
+          alert('Image corners must be transparent.');
+          reset();
+          return;
+        }
+
+        imageBase64 = (reader.result as string).split(',')[1];
+      };
+
+      img.src = dataUrl;
+    }
     reader.readAsDataURL(file);
+
+    function reset() {
+      imageBase64 = '';
+      event.target.value = '';
+    }
   }
 
   function oneIfTrue(b: boolean): number {
